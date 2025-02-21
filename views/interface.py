@@ -1,10 +1,8 @@
-from app import filmai
-import models.filmas as Filmas
 import services.data_handler as data_handler
-from config import filmu_failas
+from config import filmu_failas, seansu_failas
 import services.filmas_service as filmas_service
-
-def sukti_menu(filmai):
+import services.seansas_service as seansas_service
+def sukti_menu(filmai, seansai):
     #TODO: listai vartotoju veiksmams
     while True:
         # TODO: Prisijungimas
@@ -20,6 +18,8 @@ def sukti_menu(filmai):
                 pasalinti_filma(filmai)
             elif veiksmas == "5": # filmu redagavimas
                 redaguoti_filma(filmai)
+            elif veiksmas == "6": # suplanuoti seansa
+                prideti_seansa(seansai)
             elif veiksmas == "":
                 return
             else:
@@ -76,3 +76,12 @@ def redaguoti_filma(filmai):
     rastas_dict[keiciamas] = nauja_verte  # TODO: rasti kaip geriau, uztikrinant be klaidu
     print("Filmas sekmingai paredaguotas!")
     data_handler.issaugoti_i_faila(filmu_failas, filmai)
+
+def prideti_seansa(seansai):
+    seansas = data_handler.ivesti_seansa()
+    for esantis in seansai:
+        persidengimas = seansas_service.patikrinti_persidengima(esantis, seansas)
+        print(persidengimas)  # TODO: sutvarkyti jei persidengia
+    seansai.append(seansas)
+    print("Seansas sekmingai pridetas!")
+    data_handler.issaugoti_i_faila(seansu_failas, seansai)
