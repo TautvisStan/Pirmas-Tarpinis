@@ -5,10 +5,10 @@ def filmu_paieska_pavadinimas(filmai, paieska):
             rasti.append(filmas)
     return rasti
 
-def filmu_paieska_zanras(filmai, paieska):
+def filmu_paieska_rezisierius(filmai, paieska):
     rasti = []
     for filmas in filmai:
-        if paieska in filmas.zanras:
+        if paieska in filmas.rezisierius:
             rasti.append(filmas)
     return rasti
 
