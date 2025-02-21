@@ -40,11 +40,11 @@ def atspausdinti_filmus(filmai):
 
 def ieskoti_filmu(filmai):
         paieska = input("Iveskite, ko ieskoma: \n")
-        paieska_tipas = input("Ar norite ieskoti pagal pavadinima ('p') ar zanra ('z')? \n")
+        paieska_tipas = input("Ar norite ieskoti pagal pavadinima ('p') ar rezisieriu ('r')? \n")
         if paieska_tipas == "p":
             rasti = filmas_service.filmu_paieska_pavadinimas(filmai, paieska.lower())
-        elif paieska_tipas == "z":
-            rasti = filmas_service.filmu_paieska_zanras(filmai, paieska.lower())
+        elif paieska_tipas == "r":
+            rasti = filmas_service.filmu_paieska_rezisierius(filmai, paieska.lower())
         else:
             print("Neteisingai ivestas paieskos tipas!")
             return
