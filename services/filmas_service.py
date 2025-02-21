@@ -11,3 +11,13 @@ def filmu_paieska_zanras(filmai, paieska):
         if paieska in filmas.zanras:
             rasti.append(filmas)
     return rasti
+
+def gauti_konkretu_filma(filmai, pavadinimas):
+    rastas = None
+    indeksas = -1
+    for i, filmas in enumerate(filmai):
+        if filmas.pavadinimas == pavadinimas:
+            rastas = filmas
+            indeksas = i
+            
+    return indeksas, rastas

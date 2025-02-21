@@ -2,7 +2,7 @@ from app import filmai
 import models.filmas as Filmas
 import services.data_handler as data_handler
 from config import filmu_failas
-from services.filmas_service import *
+import services.filmas_service as filmas_service
 
 def sukti_menu(filmai):
     #TODO: listai vartotoju veiksmams
@@ -18,6 +18,8 @@ def sukti_menu(filmai):
                 ieskoti_filmu(filmai)
             elif veiksmas == '4': # Filmu salinimas
                 pasalinti_filma(filmai)
+            elif veiksmas == "5": # filmu redagavimas
+                redaguoti_filma(filmai)
             elif veiksmas == "":
                 return
             else:
@@ -40,9 +42,9 @@ def ieskoti_filmu(filmai):
         paieska = input("Iveskite, ko ieskoma: \n")
         paieska_tipas = input("Ar norite ieskoti pagal pavadinima ('p') ar zanra ('z')? \n")
         if paieska_tipas == "p":
-            rasti = filmu_paieska_pavadinimas(filmai, paieska.lower())
+            rasti = filmas_service.filmu_paieska_pavadinimas(filmai, paieska.lower())
         elif paieska_tipas == "z":
-            rasti = filmu_paieska_zanras(filmai, paieska.lower())
+            rasti = filmas_service.filmu_paieska_zanras(filmai, paieska.lower())
         else:
             print("Neteisingai ivestas paieskos tipas!")
             return
@@ -53,15 +55,24 @@ def ieskoti_filmu(filmai):
 
 def pasalinti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite pasalinti: \n")
-    rastas = None
-    for filmas in filmai:
-        if filmas.pavadinimas == pavadinimas:
-            rastas = filmas
-            break
+    indeksas, rastas = filmas_service.gauti_konkretu_filma(filmai, pavadinimas)
     if rastas is None:
         print("Tokio filmo nepavyko rasti! \n")
         return
     else:
-        filmai.remove(rastas)
+        filmai.pop(indeksas)
         print("Filmas sekmingai pasalintas!")
         data_handler.issaugoti_i_faila(filmu_failas, filmai)
+
+def redaguoti_filma(filmai):
+    pavadinimas = input("Iveskite filmo pavadinima, kuri norite redaguoti: \n")
+    indeksas, rastas = filmas_service.gauti_konkretu_filma(filmai, pavadinimas)
+    if rastas is None:
+        print("Tokio filmo nepavyko rasti! \n")
+        return
+    keiciamas = input("Iveskite, ka norite redaguoti: ('pavadinimas', 'trukme', 'zanras', 'rezisierius', 'isleidimo_metai', 'amziaus_reitingas') \n")
+    nauja_verte = input("Iveskite nauja verte: \n")
+    rastas_dict = vars(rastas)
+    rastas_dict[keiciamas] = nauja_verte  # TODO: rasti kaip geriau, uztikrinant be klaidu
+    print("Filmas sekmingai paredaguotas!")
+    data_handler.issaugoti_i_faila(filmu_failas, filmai)
