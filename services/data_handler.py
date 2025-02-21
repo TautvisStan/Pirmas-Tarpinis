@@ -5,8 +5,8 @@ def ivesti_filma():
     pavadinimas = input("Iveskite filmo pavadinima: \n")
     trukme = ivesti_skaiciu("Iveskite trukme: \n")
     zanras = input("Iveskite zanra: \n")
-    rezisierius = input("Iveskite rezisieriu: \n"),
-    isleidimo_metai = ivesti_skaiciu("Iveskite isleidimo metus: \n"), 
+    rezisierius = input("Iveskite rezisieriu: \n")
+    isleidimo_metai = ivesti_skaiciu("Iveskite isleidimo metus: \n")
     amziaus_reitingas = input("Iveskite reitinga: \n")
     return Filmas(pavadinimas, trukme, zanras, rezisierius, isleidimo_metai, amziaus_reitingas)
 

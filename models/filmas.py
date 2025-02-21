@@ -17,3 +17,5 @@ class Filmas():
         self.isleidimo_metai = isleidimo_metai
         self.amziaus_reitingas = amziaus_reitingas
 
+    def __repr__(self):
+        return f"Pavadinimas: {self.pavadinimas}, trukme: {self.trukme}, zanras: {self.zanras}, rezisierius: {self.rezisierius}, isleidimo metai: {self.isleidimo_metai}, reitingas: {self.amziaus_reitingas}"
