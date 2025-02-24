@@ -16,9 +16,10 @@ def ivesti_filma():
 
 def ivesti_seansa(filmai):
     filmo_pav = input("Iveskite filmo pavadinima: \n")
-    i, filmas = filmas_service.gauti_konkretu_filma(filmai, filmo_pav)
+    filmas = filmas_service.gauti_konkretu_filma_pav(filmai, filmo_pav)
     pradzia = ivesti_data_laika("Iveskite pradzios data ir laika: \n")
-    return Seansas(filmas, pradzia)
+    vietos = ivesti_skaiciu("Iveskite, kiek is viso vietu yra seanse: \n")
+    return Seansas(filmas, pradzia, vietos)
 
 def ivesti_data_laika(pranesimas):    
     data_str = input(pranesimas)

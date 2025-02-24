@@ -1,24 +1,37 @@
-def filmu_paieska_pavadinimas(filmai, paieska):
+from models.filmas import Filmas
+
+
+def filmu_paieska_pavadinimas(filmai : list[Filmas], paieska : str):
     rasti = []
     for filmas in filmai:
         if paieska in filmas.pavadinimas:
             rasti.append(filmas)
     return rasti
 
-def filmu_paieska_rezisierius(filmai, paieska):
+def filmu_paieska_rezisierius(filmai : list[Filmas], paieska : str):
     rasti = []
     for filmas in filmai:
         if paieska in filmas.rezisierius:
             rasti.append(filmas)
     return rasti
 
-def gauti_konkretu_filma(filmai, pavadinimas):
+def gauti_konkretu_filma_pav(filmai : list[Filmas], pavadinimas : str):
     rastas = None
-    indeksas = -1
-    for i, filmas in enumerate(filmai):
+    for filmas in filmai:
         if filmas.pavadinimas == pavadinimas:
             rastas = filmas
-            indeksas = i
+            break
     if rastas is None:
         raise ValueError("Tokio filmo nepavyko rasti!")
-    return indeksas, rastas
+    return rastas
+
+def gauti_konkretu_filma_id(filmai : list[Filmas], id):
+    rastas = None
+    for filmas in filmai:
+        
+        if filmas.id == id:
+            rastas = filmas
+            break
+    if rastas is None:
+        raise ValueError("Tokio filmo nepavyko rasti!")
+    return rastas

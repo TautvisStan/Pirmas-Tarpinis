@@ -57,18 +57,18 @@ def ieskoti_filmu(filmai):
 
 def pasalinti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite pasalinti: \n")
-    indeksas, rastas = filmas_service.gauti_konkretu_filma(filmai, pavadinimas)
+    rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
     if rastas is None:
         print("Tokio filmo nepavyko rasti! \n")
         return
     else:
-        filmai.pop(indeksas)
+        filmai.remove(rastas)
         print("Filmas sekmingai pasalintas!")
         data_handler.issaugoti_i_faila(filmu_failas, filmai)
 
 def redaguoti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite redaguoti: \n")
-    indeksas, rastas = filmas_service.gauti_konkretu_filma(filmai, pavadinimas)
+    rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
     if rastas is None:
         print("Tokio filmo nepavyko rasti! \n")
         return
@@ -91,4 +91,11 @@ def prideti_seansa(filmai, seansai):
     data_handler.issaugoti_i_faila(seansu_failas, seansai)
 
 def rodyti_seansus(filmai, seansai):
-    pass
+    for i, seansas in enumerate(seansai):
+        if seansas_service.patikrinti_ar_ateinantis(seansas):
+            try:
+                print("ASD")
+                pav = filmas_service.gauti_konkretu_filma_id(filmai, seansas.filmo_id).pavadinimas
+            except Exception as e:
+                pav = "Filmas nebuvo rastas"
+            print(f"Seanso numeris: {i}, Filmas: {pav}, pradzia: {seansas.pradzia}, pabaiga: {seansas.pabaiga}, laisvos vietos: {seansas.vietos}")
