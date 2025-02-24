@@ -3,6 +3,8 @@ from models.seansas import Seansas
 import pickle
 import datetime
 
+from services import filmas_service
+
 def ivesti_filma():
     pavadinimas = input("Iveskite filmo pavadinima: \n")
     trukme = ivesti_skaiciu("Iveskite trukme: \n")
@@ -12,11 +14,11 @@ def ivesti_filma():
     amziaus_reitingas = input("Iveskite reitinga: \n")
     return Filmas(pavadinimas, trukme, zanras, rezisierius, isleidimo_metai, amziaus_reitingas)
 
-def ivesti_seansa():  # TODO: perdaryti i aprasymas -> filmas, pabaiga -> pradzia + trukme
-    aprasymas = input("Iveskite seanso aprasyma: \n")
+def ivesti_seansa(filmai):
+    filmo_pav = input("Iveskite filmo pavadinima: \n")
+    i, filmas = filmas_service.gauti_konkretu_filma(filmai, filmo_pav)
     pradzia = ivesti_data_laika("Iveskite pradzios data ir laika: \n")
-    pabaiga = ivesti_data_laika("Iveskite pabaigos data ir laika: \n")
-    return Seansas(aprasymas, pradzia, pabaiga)
+    return Seansas(filmas, pradzia)
 
 def ivesti_data_laika(pranesimas):    
     data_str = input(pranesimas)

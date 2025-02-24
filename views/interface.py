@@ -19,7 +19,9 @@ def sukti_menu(filmai, seansai):
             elif veiksmas == "5": # filmu redagavimas
                 redaguoti_filma(filmai)
             elif veiksmas == "6": # suplanuoti seansa
-                prideti_seansa(seansai)
+                prideti_seansa(filmai, seansai)
+            elif veiksmas == "7":   # rodyti seansus
+                rodyti_seansus(filmai, seansai)
             elif veiksmas == "":
                 return
             else:
@@ -77,11 +79,16 @@ def redaguoti_filma(filmai):
     print("Filmas sekmingai paredaguotas!")
     data_handler.issaugoti_i_faila(filmu_failas, filmai)
 
-def prideti_seansa(seansai):
-    seansas = data_handler.ivesti_seansa()
+def prideti_seansa(filmai, seansai):
+    seansas = data_handler.ivesti_seansa(filmai)
     for esantis in seansai:
         persidengimas = seansas_service.patikrinti_persidengima(esantis, seansas)
-        print(persidengimas)  # TODO: sutvarkyti jei persidengia
+        if persidengimas is True:
+            print("Negalima prideti seanso, sis laikas persidengia su kitu seansu!")
+            return
     seansai.append(seansas)
     print("Seansas sekmingai pridetas!")
     data_handler.issaugoti_i_faila(seansu_failas, seansai)
+
+def rodyti_seansus(filmai, seansai):
+    pass

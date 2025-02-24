@@ -19,5 +19,6 @@ def gauti_konkretu_filma(filmai, pavadinimas):
         if filmas.pavadinimas == pavadinimas:
             rastas = filmas
             indeksas = i
-            
+    if rastas is None:
+        raise ValueError("Tokio filmo nepavyko rasti!")
     return indeksas, rastas
