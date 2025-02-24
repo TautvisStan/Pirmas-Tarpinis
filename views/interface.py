@@ -1,10 +1,8 @@
-from app import filmai
-import models.filmas as Filmas
 import services.data_handler as data_handler
-from config import filmu_failas
+from config import filmu_failas, seansu_failas
 import services.filmas_service as filmas_service
-
-def sukti_menu(filmai):
+import services.seansas_service as seansas_service
+def sukti_menu(filmai, seansai):
     #TODO: listai vartotoju veiksmams
     while True:
         # TODO: Prisijungimas
@@ -20,6 +18,10 @@ def sukti_menu(filmai):
                 pasalinti_filma(filmai)
             elif veiksmas == "5": # filmu redagavimas
                 redaguoti_filma(filmai)
+            elif veiksmas == "6": # suplanuoti seansa
+                prideti_seansa(filmai, seansai)
+            elif veiksmas == "7":   # rodyti seansus
+                rodyti_seansus(filmai, seansai)
             elif veiksmas == "":
                 return
             else:
@@ -55,18 +57,18 @@ def ieskoti_filmu(filmai):
 
 def pasalinti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite pasalinti: \n")
-    indeksas, rastas = filmas_service.gauti_konkretu_filma(filmai, pavadinimas)
+    rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
     if rastas is None:
         print("Tokio filmo nepavyko rasti! \n")
         return
     else:
-        filmai.pop(indeksas)
+        filmai.remove(rastas)
         print("Filmas sekmingai pasalintas!")
         data_handler.issaugoti_i_faila(filmu_failas, filmai)
 
 def redaguoti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite redaguoti: \n")
-    indeksas, rastas = filmas_service.gauti_konkretu_filma(filmai, pavadinimas)
+    rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
     if rastas is None:
         print("Tokio filmo nepavyko rasti! \n")
         return
@@ -76,3 +78,24 @@ def redaguoti_filma(filmai):
     rastas_dict[keiciamas] = nauja_verte  # TODO: rasti kaip geriau, uztikrinant be klaidu
     print("Filmas sekmingai paredaguotas!")
     data_handler.issaugoti_i_faila(filmu_failas, filmai)
+
+def prideti_seansa(filmai, seansai):
+    seansas = data_handler.ivesti_seansa(filmai)
+    for esantis in seansai:
+        persidengimas = seansas_service.patikrinti_persidengima(esantis, seansas)
+        if persidengimas is True:
+            print("Negalima prideti seanso, sis laikas persidengia su kitu seansu!")
+            return
+    seansai.append(seansas)
+    print("Seansas sekmingai pridetas!")
+    data_handler.issaugoti_i_faila(seansu_failas, seansai)
+
+def rodyti_seansus(filmai, seansai):
+    for i, seansas in enumerate(seansai):
+        if seansas_service.patikrinti_ar_ateinantis(seansas):
+            try:
+                print("ASD")
+                pav = filmas_service.gauti_konkretu_filma_id(filmai, seansas.filmo_id).pavadinimas
+            except Exception as e:
+                pav = "Filmas nebuvo rastas"
+            print(f"Seanso numeris: {i}, Filmas: {pav}, pradzia: {seansas.pradzia}, pabaiga: {seansas.pabaiga}, laisvos vietos: {seansas.vietos}")

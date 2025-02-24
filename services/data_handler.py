@@ -1,5 +1,9 @@
 from models.filmas import Filmas
+from models.seansas import Seansas
 import pickle
+import datetime
+
+from services import filmas_service
 
 def ivesti_filma():
     pavadinimas = input("Iveskite filmo pavadinima: \n")
@@ -9,6 +13,21 @@ def ivesti_filma():
     isleidimo_metai = ivesti_skaiciu("Iveskite isleidimo metus: \n")
     amziaus_reitingas = input("Iveskite reitinga: \n")
     return Filmas(pavadinimas, trukme, zanras, rezisierius, isleidimo_metai, amziaus_reitingas)
+
+def ivesti_seansa(filmai):
+    filmo_pav = input("Iveskite filmo pavadinima: \n")
+    filmas = filmas_service.gauti_konkretu_filma_pav(filmai, filmo_pav)
+    pradzia = ivesti_data_laika("Iveskite pradzios data ir laika: \n")
+    vietos = ivesti_skaiciu("Iveskite, kiek is viso vietu yra seanse: \n")
+    return Seansas(filmas, pradzia, vietos)
+
+def ivesti_data_laika(pranesimas):    
+    data_str = input(pranesimas)
+    try:
+        data = datetime.datetime.strptime(data_str, "%Y-%m-%d %H:%M:%S")
+        return data
+    except:
+        raise ValueError("Neteisingai ivesta data!")
 
 def ivesti_skaiciu(pranesimas):
     sk_str = input(pranesimas)
