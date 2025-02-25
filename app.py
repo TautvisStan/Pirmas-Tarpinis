@@ -8,11 +8,8 @@ filmai = []
 seansai = []
 vartotojai = []
 ivertinimai = []
-# vartotojai.append(Organizatorius("Tautvydas", "123"))
-# vartotojai.append(Ziurovas("Ziurovas1", "456"))
-# vartotojai.append(Ziurovas("Ziurovas2", "789"))
-# vartotojai.append(Ziurovas("Ziurovas3", "147"))
-# data_handler.issaugoti_i_faila(vartotoju_failas, vartotojai)
+vartotojai.append(Organizatorius("Tautvydas", "123"))
+data_handler.issaugoti_i_faila(vartotoju_failas, vartotojai)
 if __name__ == "__main__":
     
     if os.path.exists(filmu_failas):
@@ -23,4 +20,6 @@ if __name__ == "__main__":
         vartotojai = data_handler.uzkrauti_is_failo(vartotoju_failas)
     if os.path.exists(ivertinimu_failas):
         ivertinimai = data_handler.uzkrauti_is_failo(ivertinimu_failas)
+
+
     interface.sukti_menu(filmai, seansai, vartotojai, ivertinimai)

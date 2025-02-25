@@ -2,34 +2,46 @@ from models.ivertinimas import Ivertinimas
 from models.vartotojas import Organizatorius, Ziurovas
 from services import rezervacija_service
 import services.data_handler as data_handler
-from config import filmu_failas, seansu_failas, ivertinimu_failas
+from config import filmu_failas, seansu_failas, ivertinimu_failas, vartotoju_failas
 import services.filmas_service as filmas_service
 import services.seansas_service as seansas_service
 import services.ivertinimas_service as ivertinimas_service
 
 from collections import namedtuple
 
-
 def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
     Veiksmas = namedtuple("Veiksmas", ("pav", "funkcija"))
-    visi_veiksmai = [
-        Veiksmas("Iseiti", None), #TODO: isskaidyti funkcijas, iskelti i kitus failus
-        Veiksmas("Prideti filma", lambda: prideti_filma(filmai)), # 1
-        Veiksmas("Atspausdinti filmus", lambda: atspausdinti_filmus(ivertinimai, filmai)), # 2
-        Veiksmas("Ieskoti filmu", lambda: ieskoti_filmu(ivertinimai, filmai)), #3
-        Veiksmas("Pasalinti filma", lambda: pasalinti_filma(filmai)), #4
-        Veiksmas("Redaguoti filma", lambda: redaguoti_filma(filmai)), #5
-        Veiksmas("Prideti seansa", lambda: prideti_seansa(filmai,seansai)), #6
-        Veiksmas("Rodyti seansus", lambda: rodyti_seansus(filmai, seansai)), #7
-        Veiksmas("Rezervuoti seansa", lambda: rezervuoti_seansa(filmai, seansai)), # 8
-        Veiksmas("Palikti atsiliepima", lambda: palikti_atsiliepima(filmai, prisijunges, ivertinimai)) #9
-    ]
-    org_veiksmai = [0, 1, 2, 3, 4, 5, 6, 7]
-    vart_veiksmai = [0, 2, 3, 7, 8, 9]
+    
+    veiksmas_iseiti = Veiksmas("Iseiti", lambda: iseiti())
+    veiksmas_prideti_filma = Veiksmas("Prideti filma", lambda: prideti_filma(filmai))
+    veiksmas_atspausdinti_filmus = Veiksmas("Atspausdinti filmus", lambda: atspausdinti_filmus(ivertinimai, filmai))
+    veiksmas_ieskoti_filmu = Veiksmas("Ieskoti filmu", lambda: ieskoti_filmu(ivertinimai, filmai))
+    veiksmas_pasalinti_filma = Veiksmas("Pasalinti filma", lambda: pasalinti_filma(filmai))
+    veiksmas_redaguoti_filma = Veiksmas("Redaguoti filma", lambda: redaguoti_filma(filmai))
+    veiksmas_prideti_seansa = Veiksmas("Prideti seansa", lambda: prideti_seansa(filmai,seansai))
+    veiksmas_rodyti_seansus = Veiksmas("Rodyti seansus", lambda: rodyti_seansus(filmai, seansai))
+    veiksmas_rezervuoti_seansa = Veiksmas("Rezervuoti seansa", lambda: rezervuoti_seansa(filmai, seansai)) 
+    veiksmas_palikti_atsiliepima = Veiksmas("Palikti atsiliepima", lambda: palikti_atsiliepima(filmai, prisijunges, ivertinimai))
+
+    org_veiksmai = [veiksmas_iseiti,
+                    veiksmas_prideti_filma,
+                    veiksmas_atspausdinti_filmus, 
+                    veiksmas_ieskoti_filmu,
+                    veiksmas_pasalinti_filma,
+                    veiksmas_redaguoti_filma,
+                    veiksmas_prideti_seansa,
+                    veiksmas_rodyti_seansus]
+    
+    vart_veiksmai = [veiksmas_iseiti,
+                     veiksmas_atspausdinti_filmus,
+                     veiksmas_ieskoti_filmu,
+                     veiksmas_rodyti_seansus,
+                     veiksmas_rezervuoti_seansa,
+                     veiksmas_palikti_atsiliepima]
 
     prisijunges = None
     while prisijunges is None:
-        prisijunges = prisijungti(vartotojai)
+        prisijunges = prijungti(vartotojai)
 
     if isinstance(prisijunges, Ziurovas):
         veiksmai = vart_veiksmai
@@ -39,21 +51,38 @@ def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
     while True:
         try:
             print("Galimi veiksmai: \n")
-            for i, sk in enumerate(veiksmai, 0):
-                print(f"{i}: {visi_veiksmai[sk].pav}")
-            pasirinktas = int(input("Iveskite veiksma: \n")) #TODO: int patik
-            if pasirinktas in range(len(veiksmai)) and pasirinktas != 0:
-                visi_veiksmai[veiksmai[pasirinktas]].funkcija()
-            elif pasirinktas == 0:
-                return
+            for i, veiksmas in enumerate(veiksmai, 0):
+                print(f"{i}: {veiksmas.pav}")
+            pasirinktas = data_handler.ivesti_skaiciu("Iveskite veiksma: \n")
+            if pasirinktas in range(len(veiksmai)):
+                veiksmai[pasirinktas].funkcija()
             else:
                 print("Neteisingai pasirinktas veiksmas!")
         except Exception as e:
             print("Ivyko klaida!")
             print(e)
+def iseiti():
+    quit()
+
+def prijungti(vartotojai):
+    veiksmas = input("Iveskite 'p', jei norite prisijungti, kitu atveju bus sukurta nauja ziurovo paskyra \n") #TODO
+    if veiksmas == "p":
+        return prisijungti(vartotojai)
+    else:
+        return registruoti_ziurova(vartotojai)
+
+def registruoti_ziurova(vartotojai):
+    vartotojas = Ziurovas()
+    print(f"Jusu unikalus prisijungimo id yra: '{vartotojas.id}'. Atsiminkie si id!")
+    vartotojai.append(vartotojas)
+    data_handler.issaugoti_i_faila(vartotoju_failas, vartotojai)
+    return vartotojas
 
 def prisijungti(vartotojai):
-    vardas = input("Iveskite prisijungimo varda: \n")
+    vardas = input("Iveskite prisijungimo varda arba id: \n")
+    for vartotojas in vartotojai:
+        if isinstance(vartotojas, Ziurovas) and vardas == str(vartotojas.id):
+            return vartotojas
     slaptazodis = input("Iveskite slaptazodi: \n")
     for vartotojas in vartotojai:
         if vartotojas.vardas == vardas and vartotojas.slaptazodis == slaptazodis:

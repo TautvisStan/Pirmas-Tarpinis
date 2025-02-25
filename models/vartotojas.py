@@ -11,5 +11,5 @@ class Organizatorius(Vartotojas):
         super().__init__(vardas, slaptazodis)
 
 class Ziurovas(Vartotojas):
-    def __init__(self, vardas, slaptazodis):
-        super().__init__(vardas, slaptazodis)
+    def __init__(self):
+        self.id = uuid.uuid4()
