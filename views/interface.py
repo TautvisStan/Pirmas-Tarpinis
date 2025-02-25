@@ -11,7 +11,7 @@ from collections import namedtuple
 
 def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
     Veiksmas = namedtuple("Veiksmas", ("pav", "funkcija"))
-    
+
     veiksmas_iseiti = Veiksmas("Iseiti", lambda: iseiti())
     veiksmas_prideti_filma = Veiksmas("Prideti filma", lambda: prideti_filma(filmai))
     veiksmas_atspausdinti_filmus = Veiksmas("Atspausdinti filmus", lambda: atspausdinti_filmus(ivertinimai, filmai))
@@ -23,6 +23,8 @@ def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
     veiksmas_rezervuoti_seansa = Veiksmas("Rezervuoti seansa", lambda: rezervuoti_seansa(filmai, seansai)) 
     veiksmas_palikti_atsiliepima = Veiksmas("Palikti atsiliepima", lambda: palikti_atsiliepima(filmai, prisijunges, ivertinimai))
 
+#TODO pop filmai pagal rezervacijas;
+#TODO pajamos pagal bilietus
     org_veiksmai = [veiksmas_iseiti,
                     veiksmas_prideti_filma,
                     veiksmas_atspausdinti_filmus, 
@@ -41,7 +43,7 @@ def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
 
     prisijunges = None
     while prisijunges is None:
-        prisijunges = prijungti(vartotojai)
+        prisijunges = prijungti_vartotoja(vartotojai)
 
     if isinstance(prisijunges, Ziurovas):
         veiksmai = vart_veiksmai
@@ -64,10 +66,10 @@ def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
 def iseiti():
     quit()
 
-def prijungti(vartotojai):
-    veiksmas = input("Iveskite 'p', jei norite prisijungti, kitu atveju bus sukurta nauja ziurovo paskyra \n") #TODO
+def prijungti_vartotoja(vartotojai):
+    veiksmas = input("Iveskite 'p', jei norite prisijungti, kitu atveju bus sukurta nauja ziurovo paskyra \n")
     if veiksmas == "p":
-        return prisijungti(vartotojai)
+        return prisijungti_esamu(vartotojai)
     else:
         return registruoti_ziurova(vartotojai)
 
@@ -78,7 +80,7 @@ def registruoti_ziurova(vartotojai):
     data_handler.issaugoti_i_faila(vartotoju_failas, vartotojai)
     return vartotojas
 
-def prisijungti(vartotojai):
+def prisijungti_esamu(vartotojai):
     vardas = input("Iveskite prisijungimo varda arba id: \n")
     for vartotojas in vartotojai:
         if isinstance(vartotojas, Ziurovas) and vardas == str(vartotojas.id):
@@ -122,27 +124,20 @@ def ieskoti_filmu(ivertinimai, filmai):
 
 def pasalinti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite pasalinti: \n")
-    rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
-    if rastas is None:
-        print("Tokio filmo nepavyko rasti! \n")
-        return
-    else:
-        filmai.remove(rastas)
+    if filmas_service.pasalinti_filma_pagal_pav(filmai, pavadinimas) is True:
         print("Filmas sekmingai pasalintas!")
-        data_handler.issaugoti_i_faila(filmu_failas, filmai)
-
+#TODO isskaidyti veiksmus i services
 def redaguoti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite redaguoti: \n")
     rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
     if rastas is None:
         print("Tokio filmo nepavyko rasti! \n")
         return
-    keiciamas = input("Iveskite, ka norite redaguoti: ('pavadinimas', 'trukme', 'zanras', 'rezisierius', 'isleidimo_metai', 'amziaus_reitingas') \n")
-    nauja_verte = input("Iveskite nauja verte: \n")
-    rastas_dict = vars(rastas)
-    rastas_dict[keiciamas] = nauja_verte  # TODO: rasti kaip geriau, uztikrinant be klaidu
+    filmas_service.redaguoti_filma(filmas)
     print("Filmas sekmingai paredaguotas!")
     data_handler.issaugoti_i_faila(filmu_failas, filmai)
+
+
 
 def prideti_seansa(filmai, seansai):
     seansas = data_handler.ivesti_seansa(filmai)
