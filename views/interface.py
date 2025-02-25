@@ -1,72 +1,41 @@
+from models.ivertinimas import Ivertinimas
 from models.vartotojas import Organizatorius, Ziurovas
 from services import rezervacija_service
 import services.data_handler as data_handler
-from config import filmu_failas, seansu_failas
+from config import filmu_failas, seansu_failas, ivertinimu_failas
 import services.filmas_service as filmas_service
 import services.seansas_service as seansas_service
+import services.ivertinimas_service as ivertinimas_service
 
 from collections import namedtuple
-# from enum import Enum
 
 
-
-# class Organizatoriaus_Veiksmai(Enum):
-#     prideti_filma = 1
-#     atspausdinti_filmus = 2
-#     ieskoti_filmu = 3
-#     pasalinti_filma = 4
-#     redaguoti_filma = 5
-#     prideti_seansa = 6
-#     rodyti_seansus = 7
-#     rezervuoti_seansa = 8
-
-
-# alias = {
-#     '1': 'id1',
-#     '2': 'id1',
-#     '3': 'id2',
-#     '4': 'id2'
-# }
-
-# dictionary = {
-#     'id1': 1,
-#     'id2': 2
-# }
-
-# dictionary[alias['a']]
-def sukti_menu(filmai, seansai, vartotojai):
+def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
     Veiksmas = namedtuple("Veiksmas", ("pav", "funkcija"))
     visi_veiksmai = [
-        Veiksmas("Iseiti", None), #TODO: iseiti is programos????
+        Veiksmas("Iseiti", None), #TODO: isskaidyti funkcijas, iskelti i kitus failus
         Veiksmas("Prideti filma", lambda: prideti_filma(filmai)), # 1
-        Veiksmas("Atspausdinti filmus", lambda: atspausdinti_filmus(filmai)), # 2
-        Veiksmas("Ieskoti filmu", lambda: ieskoti_filmu(filmai)), #3
+        Veiksmas("Atspausdinti filmus", lambda: atspausdinti_filmus(ivertinimai, filmai)), # 2
+        Veiksmas("Ieskoti filmu", lambda: ieskoti_filmu(ivertinimai, filmai)), #3
         Veiksmas("Pasalinti filma", lambda: pasalinti_filma(filmai)), #4
         Veiksmas("Redaguoti filma", lambda: redaguoti_filma(filmai)), #5
         Veiksmas("Prideti seansa", lambda: prideti_seansa(filmai,seansai)), #6
         Veiksmas("Rodyti seansus", lambda: rodyti_seansus(filmai, seansai)), #7
-        Veiksmas("Rezervuoti seansa", lambda: rezervuoti_seansa(filmai, seansai)) # 8
-
+        Veiksmas("Rezervuoti seansa", lambda: rezervuoti_seansa(filmai, seansai)), # 8
+        Veiksmas("Palikti atsiliepima", lambda: palikti_atsiliepima(filmai, prisijunges, ivertinimai)) #9
     ]
+    org_veiksmai = [0, 1, 2, 3, 4, 5, 6, 7]
+    vart_veiksmai = [0, 2, 3, 7, 8, 9]
+
     prisijunges = None
     while prisijunges is None:
         prisijunges = prisijungti(vartotojai)
-    
 
-
-    # organizatoriaus_veiksmai = [
-    #     Veiksmas("1. Prideti filma", prideti_filma(filmai))
-    # ]
-
-    org_veiksmai = [0, 1, 2, 3, 4, 5, 6, 7]
-    vart_veiksmai = [0, 2, 3, 7, 8]
-    # veiksmas = veiksmai[org_veiksmai[indeksas]]
     if isinstance(prisijunges, Ziurovas):
-        print("ziur")
         veiksmai = vart_veiksmai
     else:
-        veiksmai = org_veiksmai
-        print("org")
+        veiksmai = org_veiksmai  
+
     while True:
         try:
             print("Galimi veiksmai: \n")
@@ -98,11 +67,16 @@ def prideti_filma(filmai):
     print("Filmas sekmingai pridetas!")
     data_handler.issaugoti_i_faila(filmu_failas, filmai)
 
-def atspausdinti_filmus(filmai):
+def atspausdinti_filmus(ivertinimai, filmai):
     for filmas in filmai:
         print(filmas)
+        filmo_ivertinimai = ivertinimas_service.gauti_filmo_atsiliepimus(ivertinimai, filmas)
+        if len(filmo_ivertinimai) != 0:
+            print(f"Ivertinimu vidurkis: {ivertinimas_service.gauti_vidurki(ivertinimai, filmas)}")
+            for iver in filmo_ivertinimai:
+                print(iver)
 
-def ieskoti_filmu(filmai):
+def ieskoti_filmu(ivertinimai, filmai):
         paieska = input("Iveskite, ko ieskoma: \n")
         paieska_tipas = input("Ar norite ieskoti pagal pavadinima ('p') ar rezisieriu ('r')? \n")
         if paieska_tipas == "p":
@@ -115,7 +89,7 @@ def ieskoti_filmu(filmai):
         if len(rasti) == 0:
             print("Nieko neradome!")
         else:
-            atspausdinti_filmus(rasti)
+            atspausdinti_filmus(ivertinimai, rasti)
 
 def pasalinti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite pasalinti: \n")
@@ -169,3 +143,20 @@ def rezervuoti_seansa(filmai, seansai):
         data_handler.issaugoti_i_faila(seansu_failas, seansai)
     else:
         print("Neteisingai ivestas indeksas!")
+
+def palikti_atsiliepima(filmai, prisijunges, ivertinimai):
+    pavadinimas = input("Iveskite filmo pavadinima: \n")
+    rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
+    if rastas is None:
+        print("Tokio filmo nepavyko rasti! \n")
+        return
+    reitingas = int(input("Iveskite reitinga: \n")) #TODO int pat; 0-10
+    atsiliepimas = input("Iveskite atsiliepima: \n")
+    ivertinimas = Ivertinimas(reitingas, atsiliepimas, rastas, prisijunges)
+    if ivertinimas_service.patikrinti_ar_toks_yra(ivertinimai, ivertinimas):
+        print("Jus jau esate palikes atsiliepima siam filmui!")
+        return
+    ivertinimai.append(ivertinimas)
+    data_handler.issaugoti_i_faila(ivertinimu_failas, ivertinimai)
+    print("Atsiliepimas sekmingai paliktas")
+

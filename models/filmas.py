@@ -9,7 +9,7 @@ class Filmas():
     
     def __init__(self, pavadinimas, trukme, zanras, rezisierius, isleidimo_metai, amziaus_reitingas):
         if self.patikrinti_reitinga(amziaus_reitingas) is False:
-            raise ValueError(f"Nepavyko sukurti filmo! Neteisingai ivestas reitingas: {amziaus_reitingas}. Privalo buti vienas is siu: {Filmas.reitingai}")
+            raise ValueError(f"Nepavyko sukurti filmo! Neteisingai ivestas amziaus reitingas: {amziaus_reitingas}. Privalo buti vienas is siu: {Filmas.reitingai}")
         self.id = uuid.uuid4()
         self.pavadinimas = pavadinimas
         self.trukme = trukme
@@ -19,4 +19,4 @@ class Filmas():
         self.amziaus_reitingas = amziaus_reitingas
 
     def __repr__(self):
-        return f"Pavadinimas: {self.pavadinimas}, trukme: {self.trukme}, zanras: {self.zanras}, rezisierius: {self.rezisierius}, isleidimo metai: {self.isleidimo_metai}, reitingas: {self.amziaus_reitingas}"
+        return f"Pavadinimas: {self.pavadinimas}, trukme: {self.trukme}, zanras: {self.zanras}, rezisierius: {self.rezisierius}, isleidimo metai: {self.isleidimo_metai}, amziaus reitingas: {self.amziaus_reitingas}"
