@@ -1,5 +1,6 @@
 from models.filmas import Filmas
 from models.seansas import Seansas
+from models.ivertinimas import Ivertinimas
 import pickle
 import datetime
 
@@ -22,12 +23,12 @@ def ivesti_seansa(filmai):
     return Seansas(filmas, pradzia, vietos)
 
 def ivesti_data_laika(pranesimas):    
-    data_str = input(pranesimas)
+    data_str = input(f"{pranesimas} (YYYY-MM-DD HH:MM:SS)")
     try:
         data = datetime.datetime.strptime(data_str, "%Y-%m-%d %H:%M:%S")
         return data
     except:
-        raise ValueError("Neteisingai ivesta data!")
+        raise ValueError("Neteisingai ivesta data/laikas!")
 
 def ivesti_skaiciu(pranesimas):
     sk_str = input(pranesimas)
@@ -54,3 +55,14 @@ def uzkrauti_is_failo(failas):
         raise FileNotFoundError("Tokio failo nera!")
     except Exception as e:
         raise e
+    
+def ivesti_ivertinima(filmai, prisijunges):
+    pavadinimas = input("Iveskite filmo pavadinima: \n")
+    rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
+    if rastas is None:
+        print("Tokio filmo nepavyko rasti! \n")
+        return
+    reitingas = ivesti_skaiciu("Iveskite reitinga: \n")
+    atsiliepimas = input("Iveskite atsiliepima: \n")
+    ivertinimas = Ivertinimas(reitingas, atsiliepimas, rastas, prisijunges)
+    return ivertinimas

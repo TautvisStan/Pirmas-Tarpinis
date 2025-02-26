@@ -126,18 +126,16 @@ def pasalinti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite pasalinti: \n")
     if filmas_service.pasalinti_filma_pagal_pav(filmai, pavadinimas) is True:
         print("Filmas sekmingai pasalintas!")
-#TODO isskaidyti veiksmus i services
+
 def redaguoti_filma(filmai):
     pavadinimas = input("Iveskite filmo pavadinima, kuri norite redaguoti: \n")
     rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
     if rastas is None:
         print("Tokio filmo nepavyko rasti! \n")
         return
-    filmas_service.redaguoti_filma(filmas)
+    filmas_service.redaguoti_filma(rastas)
     print("Filmas sekmingai paredaguotas!")
     data_handler.issaugoti_i_faila(filmu_failas, filmai)
-
-
 
 def prideti_seansa(filmai, seansai):
     seansas = data_handler.ivesti_seansa(filmai)
@@ -167,16 +165,9 @@ def rezervuoti_seansa(filmai, seansai):
         data_handler.issaugoti_i_faila(seansu_failas, seansai)
     else:
         print("Neteisingai ivestas indeksas!")
-
+        
 def palikti_atsiliepima(filmai, prisijunges, ivertinimai):
-    pavadinimas = input("Iveskite filmo pavadinima: \n")
-    rastas = filmas_service.gauti_konkretu_filma_pav(filmai, pavadinimas)
-    if rastas is None:
-        print("Tokio filmo nepavyko rasti! \n")
-        return
-    reitingas = int(input("Iveskite reitinga: \n")) #TODO int pat; 0-10
-    atsiliepimas = input("Iveskite atsiliepima: \n")
-    ivertinimas = Ivertinimas(reitingas, atsiliepimas, rastas, prisijunges)
+    ivertinimas = data_handler.ivesti_ivertinima(filmai, prisijunges)
     if ivertinimas_service.patikrinti_ar_toks_yra(ivertinimai, ivertinimas):
         print("Jus jau esate palikes atsiliepima siam filmui!")
         return

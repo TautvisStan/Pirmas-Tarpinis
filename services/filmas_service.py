@@ -45,19 +45,22 @@ def pasalinti_filma_pagal_pav(filmai, pavadinimas):
         data_handler.issaugoti_i_faila(filmu_failas, filmai)
         return True
     
-def redaguoti_filma(filmas):
+def redaguoti_filma(filmas : Filmas):
 
     keiciamas = input(f"Iveskite, ka norite redaguoti: 'pavadinimas' 'trukme', 'zanras', 'rezisierius', 'metai', 'amzius' \n")
     match keiciamas:
         case "pavadinimas":
-            pass
+            filmas.pavadinimas = input("Iveskite nauja pavadinima: \n")
+        case "trume":
+            filmas.trukme = data_handler.ivesti_skaiciu("Iveskite nauja trukme: \n")
+        case "zanras":
+            filmas.zanras = input("Iveskite nauja zanra: \n")
+        case "rezisierius":
+            filmas.rezisierius = input("Iveskite nauja rezisieriu: \n")
+        case "metai":
+            filmas.isleidimo_metai = data_handler.ivesti_skaiciu("Iveskite naujus isleidimo metus: \n")
+        case "amzius":
+            filmas.amziaus_reitingas = input("Iveskite nauja amziaus reitinga: \n")
         case _: 
             raise ValueError("Neteisingai ivestas pasirinkimas!")
-
-    rastas_dict = vars(filmas)
-    if keiciamas not in list(rastas_dict.keys()):
-        print("Neteisingai ivestas atributas!")
-        return
-    nauja_verte = input("Iveskite nauja verte: \n")
-    tipas = type(rastas_dict[keiciamas])
-    rastas_dict[keiciamas] = tipas(nauja_verte)  # TODO: keiciant int, bus str
+    return True
