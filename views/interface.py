@@ -182,5 +182,5 @@ def pateikti_pardavimu_ataskaita(filmai, pardavimai):
     data_iki = data_handler.ivesti_data_laika("Iveskite pabaigos laika: \n")
     viso, filmu_pardavimai = pardavimai_service.gauti_pardavimus(pardavimai, data_nuo, data_iki)
     print(f"Visa pardavimu suma siuo laikotarpiu: {viso}")
-    for filmo_id, suma in filmu_pardavimai:
+    for filmo_id, suma in filmu_pardavimai.items():
         print(f"{filmas_service.gauti_konkretu_filma_id(filmai, filmo_id).pavadinimas}: {suma}")
