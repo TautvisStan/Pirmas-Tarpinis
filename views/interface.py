@@ -1,15 +1,15 @@
 from models.ivertinimas import Ivertinimas
 from models.vartotojas import Organizatorius, Ziurovas
-from services import rezervacija_service
+from services import pardavimai_service, rezervacija_service
 import services.data_handler as data_handler
-from config import filmu_failas, seansu_failas, ivertinimu_failas, vartotoju_failas
+from config import filmu_failas, seansu_failas, ivertinimu_failas, vartotoju_failas, pardavimu_failas
 import services.filmas_service as filmas_service
 import services.seansas_service as seansas_service
 import services.ivertinimas_service as ivertinimas_service
 
 from collections import namedtuple
 
-def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
+def sukti_menu(filmai, seansai, vartotojai, ivertinimai, pardavimai):
     Veiksmas = namedtuple("Veiksmas", ("pav", "funkcija"))
 
     veiksmas_iseiti = Veiksmas("Iseiti", lambda: iseiti())
@@ -20,11 +20,10 @@ def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
     veiksmas_redaguoti_filma = Veiksmas("Redaguoti filma", lambda: redaguoti_filma(filmai))
     veiksmas_prideti_seansa = Veiksmas("Prideti seansa", lambda: prideti_seansa(filmai,seansai))
     veiksmas_rodyti_seansus = Veiksmas("Rodyti seansus", lambda: rodyti_seansus(filmai, seansai))
-    veiksmas_rezervuoti_seansa = Veiksmas("Rezervuoti seansa", lambda: rezervuoti_seansa(filmai, seansai)) 
+    veiksmas_rezervuoti_seansa = Veiksmas("Rezervuoti seansa", lambda: rezervuoti_seansa(filmai, seansai, pardavimai)) 
     veiksmas_palikti_atsiliepima = Veiksmas("Palikti atsiliepima", lambda: palikti_atsiliepima(filmai, prisijunges, ivertinimai))
+    veiksmas_pateikti_pardavimu_ataskaita = Veiksmas("Pateikti pardavimu ataskaita", lambda: pateikti_pardavimu_ataskaita(filmai, pardavimai))
 
-#TODO pop filmai pagal rezervacijas;
-#TODO pajamos pagal bilietus
     org_veiksmai = [veiksmas_iseiti,
                     veiksmas_prideti_filma,
                     veiksmas_atspausdinti_filmus, 
@@ -32,7 +31,8 @@ def sukti_menu(filmai, seansai, vartotojai, ivertinimai):
                     veiksmas_pasalinti_filma,
                     veiksmas_redaguoti_filma,
                     veiksmas_prideti_seansa,
-                    veiksmas_rodyti_seansus]
+                    veiksmas_rodyti_seansus,
+                    veiksmas_pateikti_pardavimu_ataskaita]
     
     vart_veiksmai = [veiksmas_iseiti,
                      veiksmas_atspausdinti_filmus,
@@ -155,17 +155,19 @@ def rodyti_seansus(filmai, seansai):
                 pav = filmas_service.gauti_konkretu_filma_id(filmai, seansas.filmo_id).pavadinimas
             except Exception as e:
                 pav = "Filmas nebuvo rastas"
-            print(f"Seanso numeris: {i+1}, Filmas: {pav}, pradzia: {seansas.pradzia}, pabaiga: {seansas.pabaiga}, laisvos vietos: {seansas.vietos}")
+            print(f"Seanso numeris: {i+1}, Filmas: {pav}, pradzia: {seansas.pradzia}, pabaiga: {seansas.pabaiga}, laisvos vietos: {seansas.vietos}, kaina: {seansas.kaina}")
 
-def rezervuoti_seansa(filmai, seansai):
+def rezervuoti_seansa(filmai, seansai, pardavimai):
     indeksas = data_handler.ivesti_skaiciu("Iveskite seanso numeri: \n")
     if 0 < indeksas <= len(seansai) and seansas_service.patikrinti_ar_ateinantis(seansai[indeksas-1]):
         rezervacija_service.rezervuoti(seansai[indeksas-1])
+        pardavimai.append(pardavimai_service.uzregistruoti_pardavima(seansai[indeksas-1]))
         print("Sekmingai rezervuota!")
+        data_handler.issaugoti_i_faila(pardavimu_failas, pardavimai)
         data_handler.issaugoti_i_faila(seansu_failas, seansai)
     else:
         print("Neteisingai ivestas indeksas!")
-        
+
 def palikti_atsiliepima(filmai, prisijunges, ivertinimai):
     ivertinimas = data_handler.ivesti_ivertinima(filmai, prisijunges)
     if ivertinimas_service.patikrinti_ar_toks_yra(ivertinimai, ivertinimas):
@@ -175,3 +177,10 @@ def palikti_atsiliepima(filmai, prisijunges, ivertinimai):
     data_handler.issaugoti_i_faila(ivertinimu_failas, ivertinimai)
     print("Atsiliepimas sekmingai paliktas")
 
+def pateikti_pardavimu_ataskaita(filmai, pardavimai):
+    data_nuo = data_handler.ivesti_data_laika("Iveskite pradzios laika: \n")
+    data_iki = data_handler.ivesti_data_laika("Iveskite pabaigos laika: \n")
+    viso, filmu_pardavimai = pardavimai_service.gauti_pardavimus(pardavimai, data_nuo, data_iki)
+    print(f"Visa pardavimu suma siuo laikotarpiu: {viso}")
+    for filmo_id, suma in filmu_pardavimai:
+        print(f"{filmas_service.gauti_konkretu_filma_id(filmai, filmo_id).pavadinimas}: {suma}")

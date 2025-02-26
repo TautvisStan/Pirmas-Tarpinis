@@ -20,10 +20,11 @@ def ivesti_seansa(filmai):
     filmas = filmas_service.gauti_konkretu_filma_pav(filmai, filmo_pav)
     pradzia = ivesti_data_laika("Iveskite pradzios data ir laika: \n")
     vietos = ivesti_skaiciu("Iveskite, kiek is viso vietu yra seanse: \n")
-    return Seansas(filmas, pradzia, vietos)
+    kaina = ivesti_skaiciu_f("Iveskite bilieto kaina: \n")
+    return Seansas(filmas, pradzia, vietos, kaina)
 
 def ivesti_data_laika(pranesimas):    
-    data_str = input(f"{pranesimas} (YYYY-MM-DD HH:MM:SS)")
+    data_str = input(f"{pranesimas} (YYYY-MM-DD HH:MM:SS)\n")
     try:
         data = datetime.datetime.strptime(data_str, "%Y-%m-%d %H:%M:%S")
         return data
@@ -37,7 +38,14 @@ def ivesti_skaiciu(pranesimas):
         return sk_int
     except:
         raise ValueError("Neteisingai ivestas skaicius!")
-    
+
+def ivesti_skaiciu_f(pranesimas):
+    sk_str = input(pranesimas)
+    try:
+        sk_float = float(sk_str)
+        return sk_float
+    except:
+        raise ValueError("Neteisingai ivestas skaicius!")
 
 def issaugoti_i_faila(failas, objektas):
     try:
