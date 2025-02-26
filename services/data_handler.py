@@ -1,3 +1,4 @@
+import os
 from models.filmas import Filmas
 from models.seansas import Seansas
 from models.ivertinimas import Ivertinimas
@@ -49,6 +50,7 @@ def ivesti_skaiciu_f(pranesimas):
 
 def issaugoti_i_faila(failas, objektas):
     try:
+        os.makedirs(os.path.dirname(failas), exist_ok=True)
         with open(failas, 'wb') as f:
             pickle.dump(objektas, f)
     except Exception as e:

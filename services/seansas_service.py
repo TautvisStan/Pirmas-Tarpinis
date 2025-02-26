@@ -7,7 +7,6 @@ def patikrinti_persidengima(seansas1 : Seansas, seansas2 : Seansas):
 
     skritumas = (anskciausias_startas - veliausias_startas).total_seconds()
     persidengimas = max(0, skritumas)
-    print(f"{veliausias_startas}, {anskciausias_startas}, {persidengimas}")
     return persidengimas > 0
 
 def patikrinti_ar_ateinantis(seansas : Seansas):
